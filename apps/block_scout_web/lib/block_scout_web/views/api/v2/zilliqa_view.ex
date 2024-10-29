@@ -3,6 +3,7 @@ if Application.compile_env(:explorer, :chain_type) == :zilliqa do
     @moduledoc """
     View functions for rendering Zilliqa-related data in JSON format.
     """
+    import Explorer.Chain.Zilliqa.Helper, only: [scilla_transaction?: 1]
 
     alias Explorer.Chain.Block
     alias Explorer.Chain.Zilliqa.{AggregateQuorumCertificate, QuorumCertificate}
@@ -43,6 +44,7 @@ if Application.compile_env(:explorer, :chain_type) == :zilliqa do
     - `out_json`: A map defining the output JSON which will be extended.
     - `transaction`: The transaction structure containing Zilliqa-related data.
 
+    <<<<<<< HEAD
     ## Returns
     - A map extended with data related to Zilliqa.
     """
