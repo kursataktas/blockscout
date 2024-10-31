@@ -7,9 +7,7 @@ if Application.compile_env(:explorer, :chain_type) == :zilliqa do
 
     alias Explorer.Chain.Block
     alias Explorer.Chain.Zilliqa.{AggregateQuorumCertificate, QuorumCertificate}
-    alias Explorer.Chain.{Address, Block, Transaction}
-
-    @scilla_transactions_v Decimal.new(0)
+    alias Explorer.Chain.{Block, Transaction}
 
     @doc """
     Extends the JSON output with a sub-map containing information related to Zilliqa,
@@ -51,17 +49,9 @@ if Application.compile_env(:explorer, :chain_type) == :zilliqa do
     @spec extend_transaction_json_response(map(), Transaction.t()) :: map()
     def extend_transaction_json_response(out_json, %Transaction{} = transaction) do
       Map.put(out_json, :zilliqa, %{
-        is_scilla: is_scilla_transaction(transaction)
+        is_scilla: scilla_transaction?(transaction)
       })
     end
-
-    @doc """
-    Checks if a transaction is a Scilla transaction.
-
-    Scilla transactions have `v` set to #{@scilla_transactions_v}.
-    """
-    @spec is_scilla_contract_address(Transaction.t()) :: boolean()
-    def is_scilla_transaction(%Transaction{v: v}), do: v == @scilla_transactions_v
 
     @spec add_quorum_certificate(map(), Block.t()) :: map()
     defp add_quorum_certificate(
