@@ -302,11 +302,11 @@ defmodule BlockScoutWeb.API.V2.SmartContractView do
              %Address{contracts_creation_transaction: transaction}
            ) do
         # credo:disable-for-next-line Credo.Check.Design.AliasUsage
-        is_sciila_contract =
+        is_scilla_contract =
           (transaction && Explorer.Chain.Zilliqa.Helper.scilla_transaction?(transaction)) || false
 
         Map.put(smart_contract_info, :zilliqa, %{
-          is_scilla_contract: is_sciila_contract
+          is_scilla_contract: is_scilla_contract
         })
       end
 
