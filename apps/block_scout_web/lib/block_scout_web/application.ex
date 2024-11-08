@@ -5,7 +5,7 @@ defmodule BlockScoutWeb.Application do
 
   use Application
 
-  alias BlockScoutWeb.Endpoint
+  alias BlockScoutWeb.{Endpoint, HealthEndpoint}
   alias BlockScoutWeb.Prometheus.Exporter, as: PrometheusExporter
   alias BlockScoutWeb.Prometheus.PublicExporter, as: PrometheusPublicExporter
 
@@ -13,7 +13,7 @@ defmodule BlockScoutWeb.Application do
     opts = [strategy: :one_for_one, name: BlockScoutWeb.Supervisor, max_restarts: 1_000]
 
     if Application.get_env(:nft_media_handler, :standalone_media_worker?) do
-      Supervisor.start_link([], opts)
+      Supervisor.start_link([Supervisor.child_spec(HealthEndpoint, [])], opts)
     else
       base_children = [Supervisor.child_spec(Endpoint, [])]
       api_children = setup_and_define_children()
