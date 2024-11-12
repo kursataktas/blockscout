@@ -42,7 +42,6 @@ if Application.compile_env(:explorer, :chain_type) == :zilliqa do
     - `out_json`: A map defining the output JSON which will be extended.
     - `transaction`: The transaction structure containing Zilliqa-related data.
 
-    <<<<<<< HEAD
     ## Returns
     - A map extended with data related to Zilliqa.
     """
