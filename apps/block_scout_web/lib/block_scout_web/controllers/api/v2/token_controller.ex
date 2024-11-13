@@ -386,6 +386,6 @@ defmodule BlockScoutWeb.API.V2.TokenController do
          token_instance,
          token
        ) do
-    %{token_instance | token: token}
+    %Instance{token_instance | token: token}
   end
 end
