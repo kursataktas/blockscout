@@ -5,13 +5,14 @@ defmodule BlockScoutWeb.API.V2.SmartContractView do
   import Explorer.SmartContract.Reader, only: [zip_tuple_values_with_types: 2]
 
   alias ABI.FunctionSelector
+  alias BlockScoutWeb.{ABIEncodedValueView, AddressContractView, AddressView}
   alias BlockScoutWeb.API.V2.{Helper, TransactionView}
   alias BlockScoutWeb.SmartContractView
-  alias BlockScoutWeb.{ABIEncodedValueView, AddressContractView, AddressView}
   alias Ecto.Changeset
   alias Explorer.Chain
   alias Explorer.Chain.{Address, Hash, SmartContract, SmartContractAdditionalSource}
   alias Explorer.Chain.SmartContract.Proxy
+  alias Explorer.Chain.Zilliqa.Helper, as: ZilliqaHelper
   alias Explorer.SmartContract.Helper, as: SmartContractHelper
   alias Explorer.Visualize.Sol2uml
 
@@ -224,7 +225,7 @@ defmodule BlockScoutWeb.API.V2.SmartContractView do
           do:
             target_contract && format_constructor_arguments(target_contract.abi, target_contract.constructor_arguments)
         ),
-      "language" => smart_contract_language(smart_contract),
+      "language" => smart_contract_language(address),
       "license_type" => smart_contract.license_type,
       "certified" => if(smart_contract.certified, do: smart_contract.certified, else: false),
       "is_blueprint" => if(smart_contract.is_blueprint, do: smart_contract.is_blueprint, else: false)
@@ -233,7 +234,6 @@ defmodule BlockScoutWeb.API.V2.SmartContractView do
     |> add_chain_type_fields(
       %{
         target_contract: target_contract,
-        address: address,
         verified_twin_address_hash: verified_twin_address_hash
       },
       true
@@ -294,7 +294,6 @@ defmodule BlockScoutWeb.API.V2.SmartContractView do
           map(),
           %{
             target_contract: SmartContract.t(),
-            address: Address.t(),
             verified_twin_address_hash: Hash.Address.t() | nil
           },
           boolean()
@@ -326,12 +325,6 @@ defmodule BlockScoutWeb.API.V2.SmartContractView do
           "zk_compiler_version",
           target_contract.zk_compiler_version
         )
-      end
-
-    :zilliqa ->
-      defp add_chain_type_fields(smart_contract_info, %{address: address}, _single?) do
-        # credo:disable-for-next-line Credo.Check.Design.AliasUsage
-        BlockScoutWeb.API.V2.ZilliqaView.extend_smart_contract_json_response(smart_contract_info, address)
       end
 
     _ ->
@@ -403,7 +396,7 @@ defmodule BlockScoutWeb.API.V2.SmartContractView do
         "transaction_count" => smart_contract.address.transactions_count,
         # todo: keep next line for compatibility with frontend and remove when new frontend is bound to `transaction_count` property
         "tx_count" => smart_contract.address.transactions_count,
-        "language" => smart_contract_language(smart_contract),
+        "language" => smart_contract_language(address),
         "verified_at" => smart_contract.inserted_at,
         "market_cap" => token && token.circulating_market_cap,
         "has_constructor_args" => !is_nil(smart_contract.constructor_arguments),
@@ -417,19 +410,26 @@ defmodule BlockScoutWeb.API.V2.SmartContractView do
     |> add_chain_type_fields(
       %{
         target_contract: smart_contract,
-        address: address,
         verified_twin_address_hash: nil
       },
       false
     )
   end
 
-  defp smart_contract_language(smart_contract) do
+  @spec smart_contract_language(Address.t()) :: String.t()
+  defp smart_contract_language(address) do
     cond do
-      smart_contract.is_vyper_contract ->
+      # todo: This is a temporary workaround to find Scilla contracts.
+      # As soon as https://github.com/blockscout/blockscout/pull/11183
+      # is merged, we should migrate to `language` field.
+      Application.get_env(:explorer, :chain_type) == :zilliqa and
+          ZilliqaHelper.scilla_transaction?(address.contracts_creation_transaction) ->
+        "scilla"
+
+      address.smart_contract.is_vyper_contract ->
         "vyper"
 
-      is_nil(smart_contract.abi) ->
+      is_nil(address.smart_contract.abi) ->
         "yul"
 
       true ->
