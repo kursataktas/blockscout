@@ -71,7 +71,7 @@ defmodule Indexer.MixProject do
       {:spandex_datadog, "~> 1.0"},
       {:logger_json, "~> 5.1"},
       {:varint, "~> 1.4"},
-      {:nft_media_handler_dispatcher, in_umbrella: true}
+      {:cachex, "~> 4.0"}
     ]
   end
 
