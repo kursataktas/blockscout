@@ -80,8 +80,8 @@
         "blockreward",
         "blockscout",
         "blockscoutuser",
-        "bools",
         "Boneh",
+        "bools",
         "bridgedtokenlist",
         "brotli",
         "browserconfig",
@@ -179,6 +179,7 @@
         "descr",
         "describedby",
         "dets",
+        "dfda",
         "differenceby",
         "discordapp",
         "disksup",
@@ -650,12 +651,12 @@
         "xakgj",
         "xbaddress",
         "xdai",
-        "Xname",
         "xffff",
         "xlevel",
         "xlink",
         "xmark",
         "xmlhttprequest",
+        "Xname",
         "xnonsense",
         "xzzz",
         "yellowgreen",
@@ -678,5 +679,5 @@
         "dotenv",
         "html-eex",
         "makefile"
-    ],
+    ]
 }
